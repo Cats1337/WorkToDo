@@ -1,0 +1,381 @@
+/* Grid layout for week header */
+.week-header-grid {
+  display: grid;
+  grid-template-areas:
+    'title checkbox'
+    'items status';
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0.5em;
+  width: 100%;
+  min-width: 0;
+  justify-items: stretch;
+}
+.week-header-grid h2 {
+  grid-area: title;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.week-header-grid label {
+  grid-area: checkbox;
+  user-select: none;
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-right: 2px;
+}
+
+.week-header-grid input[type="checkbox"].toggle-all {
+  accent-color: var(--muted);
+  width: 15px;
+  height: 15px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  background: var(--panel);
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+
+.week-header-grid input[type="checkbox"].toggle-all:hover {
+  border-color: #2f3745;
+}
+
+.week-header-grid input[type="checkbox"].toggle-all:checked {
+  accent-color: var(--muted);
+  background: var(--bg);
+  border-color: var(--border);
+  opacity: 0.35;
+}
+
+.week-header-grid input[type="checkbox"].toggle-all:not(checked) {
+  opacity: 0.7;
+  /* change out the white background */
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+.week-header-grid .meta {
+  grid-area: items;
+  margin-top: 0.25em;
+}
+.week-header-grid .badges {
+  grid-area: status;
+}
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --muted: #9aa4b2;
+  --text: #eef2f7;
+  --accent: #6ee7ff;
+  --ok: #38d39f;
+  --warn: #ffd166;
+  --danger: #ff6b6b;
+  --border: #242a34;
+  --link: #7dd3fc;
+}
+
+* {
+  box-sizing: border-box
+}
+
+html,
+body {
+  height: 100%
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial
+}
+
+a {
+  color: var(--link);
+  text-decoration: none
+}
+
+a:hover {
+  text-decoration: underline
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px
+}
+
+h1 {
+  font-size: clamp(20px, 3vw, 28px);
+  margin: 0
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap
+}
+
+button {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer
+}
+
+button:hover {
+  border-color: #2f3745
+}
+
+input[type="url"],
+input[type="file"] {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 12px;
+  outline: none
+}
+
+.pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px
+}
+
+@media (min-width:900px) {
+  .grid {
+    grid-template-columns: 1fr 1fr
+  }
+}
+
+.week {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #151922, #12161d);
+  border-radius: 16px;
+  overflow: hidden
+}
+
+.week header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.week h2 {
+  margin: 0;
+  font-size: 18px
+}
+
+.week .meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap
+}
+
+.week.current header {
+  outline: 2px solid var(--accent);
+  border-radius: 12px
+}
+
+.badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap
+}
+
+details {
+  background: transparent
+}
+
+summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer
+}
+
+summary::-webkit-details-marker {
+  display: none
+}
+
+.items {
+  padding: 8px 16px 16px
+}
+
+.task {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #0f131a
+}
+
+.task+.task {
+  margin-top: 8px
+}
+
+.task.done {
+  opacity: .55
+}
+
+.task .title {
+  font-weight: 600
+}
+
+.task .note {
+  margin-top: 6px;
+  color: #cfd7e3
+}
+
+.task small {
+  color: var(--muted)
+}
+
+.task .course {
+  margin-left: 8px
+}
+
+.course {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px
+}
+
+.bar {
+  flex: 1;
+  height: 8px;
+  background: #0c0f14;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden
+}
+
+.fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), #a7f3d0)
+}
+
+.stat {
+  font-size: 13px;
+  color: var(--muted)
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 18px
+}
+
+.tag {
+  border: 1px solid var(--border);
+  background: #0e1218;
+  color: #c8d1de;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer
+}
+
+.tag.active {
+  outline: 2px solid #2b3340
+}
+
+.toolbar .spacer {
+  flex: 1
+}
+
+.toolbar input[type="search"] {
+  min-width: 220px;
+  background: #0e1218;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  outline: none
+}
+
+.footer {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 13px
+}
+
+/* 
+open - Yellow or Blue?
+Done - Green or Grayed out?
+Due Soon - Orange
+Overdue - Red
+*/
+/* class="tag" data-filter="past" */
+
+.tag[data-filter="open"],
+.pill.good {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.tag[data-filter="done"],
+.pill.ok {
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.tag[data-filter="due"],
+.pill.warn {
+  border-color: #ff9800;
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+}
+
+.tag[data-filter="past"],
+.pill.danger {
+  border-color: #f44336;
+  background: rgba(255, 17, 0, 0.1);
+  color: #f44336
+}

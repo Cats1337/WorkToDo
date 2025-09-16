@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work To Do — Games x Literature Fall 2025</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Work To Do — Games x Literature, Fall 2025</h1>
+      <div class="controls">
+        <button id="expandAll">Expand all</button>
+        <button id="collapseAll">Collapse all</button>
+        <button id="exportProgress">Export progress</button>
+        <button id="downloadICS">Calendar .ics</button>
+
+        <input id="icsUrl" type="url" placeholder="myCourses .ics URL" style="min-width:280px">
+        <button id="importICS">Import ICS</button>
+        <input id="icsFile" type="file" accept=".ics" style="display:none">
+        <button id="importICSFile">Import .ics file</button>
+      </div>
+    </header>
+
+    <div class="progress" id="topProgress">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="stat" id="stat">0 of 0 done</div>
+    </div>
+
+    <div class="toolbar">
+      <span class="tag active" data-filter="all">All</span>
+      <span class="tag" data-filter="open">Open</span>
+      <span class="tag" data-filter="done">Done</span>
+      <span class="tag" data-filter="due">Due soon</span>
+      <span class="tag" data-filter="past">Overdue</span>
+      <span class="spacer"></span>
+      <input id="classFilter" type="search" placeholder="Filter by class" list="courseList" />
+      <datalist id="courseList"></datalist>
+    </div>
+
+    <section class="grid" id="weeks"></section>
+    <p class="footer">Progress saves locally. Dates are Eastern Time.</p>
+  </div>
+
+    <!-- scripts at bottom -->
+    <script src="data.js"></script>
+    <script src="ics.js"></script>
+    <script src="ics-importer.js"></script>
+    <script src="app.js"></script>
+
+</body>
+</html>
