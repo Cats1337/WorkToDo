@@ -41,35 +41,13 @@
     return diff >= 0 && diff <= 7;
   };
 
-  const importBtn = document.getElementById("importICS");
   const importFileBtn = document.getElementById("importICSFile");
-  const icsUrlInput = document.getElementById("icsUrl");
 
   // simple persistence for imported UID set
   const getImported = () =>
     JSON.parse(localStorage.getItem("worktodo.importedUIDs") || "[]");
   const setImported = (uids) =>
     localStorage.setItem("worktodo.importedUIDs", JSON.stringify(uids));
-
-  // hook up ICS URL import
-  importBtn.addEventListener("click", async () => {
-    const url = (icsUrlInput.value || "").trim();
-    if (!url) return alert("Paste a valid .ics URL");
-    try {
-      const { weeksAdded, tasksAdded, uids } = await window.importICSFromUrl(
-        url,
-        "myCourses"
-      );
-      setImported([...new Set([...getImported(), ...uids])]);
-      alert(`Imported ${tasksAdded} task(s) across ${weeksAdded} week(s).`);
-      render();
-    } catch (e) {
-      console.error(e);
-      alert(
-        "Import failed. Some .ics URLs block CORS. Use the file import if needed."
-      );
-    }
-  });
 
   // hook up ICS file import
   importFileBtn.addEventListener("click", () =>
@@ -79,9 +57,18 @@
     const file = e.target.files?.[0];
     if (!file) return;
     const text = await file.text();
+    let startDate = prompt("Enter start date (YYYY-MM-DD) to import from:", "");
+    if (startDate) {
+      startDate = startDate.trim();
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+        alert("Invalid date format. Please use YYYY-MM-DD.");
+        return;
+      }
+    }
     const { weeksAdded, tasksAdded, uids } = window.importICSFromText(
       text,
-      "myCourses"
+      "myCourses",
+      startDate
     );
     setImported([...new Set([...getImported(), ...uids])]);
     alert(`Imported ${tasksAdded} task(s) across ${weeksAdded} week(s).`);

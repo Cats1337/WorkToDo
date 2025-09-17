@@ -133,19 +133,17 @@
     };
   }
 
-  async function importICSFromUrl(url, courseLabel){
-    const res = await fetch(url); // may be blocked by CORS
-    if(!res.ok) throw new Error('Fetch failed');
-    const text = await res.text();
-    return importICSFromText(text, courseLabel);
-  }
-
-  function importICSFromText(text, courseLabel){
+  function importICSFromText(text, courseLabel, startDate) {
     const events = parseICS(text);
-    const result = mergeEventsIntoWeeks(window.WEEKS, events, courseLabel);
-    return result;
+    let filteredEvents = events;
+    if (startDate) {
+      filteredEvents = events.filter(ev => {
+        const ymd = normalizeToLocalDate(ev.dtstartRaw);
+        return ymd && ymd >= startDate;
+      });
+    }
+    return mergeEventsIntoWeeks(window.WEEKS, filteredEvents, courseLabel);
   }
 
-  window.importICSFromUrl = importICSFromUrl;
   window.importICSFromText = importICSFromText;
 })();
