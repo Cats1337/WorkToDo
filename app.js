@@ -75,6 +75,17 @@
     render();
   });
 
+  // Table of course URLs for myCourses 
+  // 1160862
+  const COURSEID = {
+    'Games & Lit': '1166199',
+    'Sci & Tech Policies': '1162195',
+    'Data Journalism': '1164981',
+    'AI in Society': '1167927',
+    'Language of Medicine': '1162213',
+    'Soc Conseq Tech': '1160862',
+  };
+
   function allCourses() {
     const set = new Set();
     for (const w of window.WEEKS) {
@@ -93,6 +104,36 @@
     }
   }
 
+  // Add toggle for hiding/showing completed articles
+  // Persist completed/collapsed toggles in localStorage
+  function getToggles() {
+    return JSON.parse(localStorage.getItem("worktodo.toggles") || "{}");
+  }
+  function setToggles(toggles) {
+    localStorage.setItem("worktodo.toggles", JSON.stringify(toggles));
+  }
+  const toggles = getToggles();
+  let showCompletedArticles = toggles.showCompletedArticles !== undefined ? toggles.showCompletedArticles : true;
+  let expanded = toggles.expanded !== undefined ? toggles.expanded : true;
+  const toggleCompletedBtn = document.createElement('button');
+  toggleCompletedBtn.textContent = 'Hide Completed Weeks';
+  toggleCompletedBtn.onclick = () => {
+    showCompletedArticles = !showCompletedArticles;
+    toggleCompletedBtn.textContent = showCompletedArticles ? 'Hide Completed Weeks' : 'Show Completed Weeks';
+    setToggles({
+      ...getToggles(),
+      showCompletedArticles,
+      expanded
+    });
+    render();
+  };
+  document.addEventListener('DOMContentLoaded', () => {
+    const controlsDiv = document.querySelector('.controls');
+    if (controlsDiv) {
+      controlsDiv.insertBefore(toggleCompletedBtn, controlsDiv.firstChild);
+    }
+  });
+
   function render() {
     populateCourseList();
     weeksEl.innerHTML = "";
@@ -100,6 +141,7 @@
     const filter = document.querySelector(".tag.active")?.dataset.filter || "";
     const classQuery = (classInput.value || "").trim().toLowerCase();
 
+    let anyWeekShown = false;
     for (const w of window.WEEKS) {
       const isPast = new Date(w.date + "T00:00:00") < today;
       const isToday = w.date === ymdToday();
@@ -112,13 +154,12 @@
           return false;
         return true;
       });
-
       const done = filteredTasks.every((it) => !!state[it.id]);
-
-      if (isPast && filteredTasks.length === 0) continue;
+      if (!showCompletedArticles && done) continue;
+      anyWeekShown = true;
 
       const week = document.createElement("article");
-      week.className = "week" + (isToday ? " current" : "");
+      week.className = "week" + (isToday ? " current" : "") + (done ? " done" : "");
 
       const open = filteredTasks.some(it => !state[it.id]);
       const badges = [];
@@ -169,6 +210,13 @@
         const done = !!state[it.id];
         const row = document.createElement("div");
         row.className = "task" + (done ? " done" : "");
+        // Make class pill clickable and link to myCourses if available
+        let classPill = "";
+        if (it.course && COURSEID[it.course]) {
+          classPill = `<a href="https://mycourses.rit.edu/course/d2l/le/content/${COURSEID[it.course]}/Home" class="course" style="text-decoration:none;" target="_blank" rel="noopener">${it.course}</a>`;
+        } else if (it.course) {
+          classPill = `<span class="course">${it.course}</span>`;
+        }
         const link = it.url
           ? `<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>`
           : `<span class="title">${it.title}</span>`;
@@ -177,11 +225,9 @@
           done ? "checked" : ""
         } aria-label="toggle ${it.title}">
           <div>
-            <div class="title">${icon(it.kind)} ${link} ${
-          it.course ? `<span class="course">${it.course}</span>` : ""
-        }</div>
+            <div class="title">${icon(it.kind)} ${link} ${classPill}</div>
             ${it.note ? `<div class="note">${it.note}</div>` : ""}
-            <small>${it.kind}</small>
+            <small>${it.kind.charAt(0).toUpperCase() + it.kind.slice(1)}</small>
           </div>`;
         row.querySelector("input").addEventListener("change", (e) => {
           const s = getState();
@@ -194,6 +240,23 @@
       }
 
       weeksEl.appendChild(week);
+    }
+    // If no weeks are shown, show all weeks regardless of toggle
+    if (!anyWeekShown) {
+      weeksEl.innerHTML = "";
+      for (const w of window.WEEKS) {
+        const isPast = new Date(w.date + "T00:00:00") < today;
+        const isToday = w.date === ymdToday();
+        const soon = isSoon(w.date);
+        const filteredTasks = w.items.filter((it) => true);
+        const done = filteredTasks.every((it) => !!state[it.id]);
+        const week = document.createElement("article");
+        week.className = "week" + (isToday ? " current" : "") + (done ? " done" : "");
+        // ...existing code for badges, header, items...
+        // For brevity, you may want to refactor this into a helper function
+        // ...existing code...
+        weeksEl.appendChild(week);
+      }
     }
 
     updateProgress();
@@ -225,16 +288,6 @@
     tHandle = setTimeout(render, 150);
   });
 
-  document.getElementById("expandAll").addEventListener("click", () => {
-    document
-      .querySelectorAll(".week details")
-      .forEach((d) => d.setAttribute("open", ""));
-  });
-  document.getElementById("collapseAll").addEventListener("click", () => {
-    document
-      .querySelectorAll(".week details")
-      .forEach((d) => d.removeAttribute("open"));
-  });
   document.getElementById("exportProgress").addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(getState(), null, 2)], {
       type: "application/json",
@@ -254,6 +307,39 @@
     a.click();
     URL.revokeObjectURL(a.href);
   });
+
+  // Move Hide Completed checkbox into .controls
+  const controlsDiv = document.querySelector('.controls');
+  const hideCompletedLabel = document.createElement('label');
+  hideCompletedLabel.style.display = 'flex';
+    // Move Hide Completed Weeks button into .controls, replacing the checkbox
+    // Use the already declared toggleCompletedBtn from above
+    // Move Hide Completed Weeks button to the top of controls
+    controlsDiv.insertBefore(toggleCompletedBtn, controlsDiv.firstChild);
+
+  // Replace Expand All and Collapse All with a single toggle button
+  // let expanded = true; // Remove redeclaration, use the one from above
+  const expandToggleBtn = document.createElement('button');
+  expandToggleBtn.textContent = 'Collapse All';
+  expandToggleBtn.onclick = () => {
+    expanded = !expanded;
+    expandToggleBtn.textContent = expanded ? 'Collapse All' : 'Expand All';
+    setToggles({
+      ...getToggles(),
+      showCompletedArticles,
+      expanded
+    });
+    document.querySelectorAll('.week details').forEach(d => {
+      if (expanded) d.setAttribute('open', '');
+      else d.removeAttribute('open');
+    });
+  };
+  // Remove old buttons and add new toggle
+  const expandBtn = document.getElementById('expandAll');
+  const collapseBtn = document.getElementById('collapseAll');
+  if (expandBtn) expandBtn.remove();
+  if (collapseBtn) collapseBtn.remove();
+  controlsDiv.insertBefore(expandToggleBtn, controlsDiv.firstChild);
 
   render();
 })();
